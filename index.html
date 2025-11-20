@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>TinyLink - URL Shortener (Frontend)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- Simple styling -->
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      background: #f3f4f6;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .card {
+      width: 100%;
+      max-width: 700px;
+      background: #ffffff;
+      border-radius: 18px;
+      padding: 30px 32px 26px;
+      box-shadow: 0 18px 45px rgba(15, 23, 42, 0.12);
+    }
+
+    .title {
+      text-align: center;
+      font-size: 28px;
+      font-weight: 700;
+      color: #2563eb;
+      margin-bottom: 4px;
+    }
+
+    .subtitle {
+      text-align: center;
+      font-size: 13px;
+      color: #6b7280;
+      margin-bottom: 22px;
+    }
+
+    label {
+      font-size: 13px;
+      font-weight: 600;
+      color: #374151;
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    .input-group {
+      margin-bottom: 14px;
+    }
+
+    input[type="url"] {
+      width: 100%;
+      padding: 11px 12px;
+      border-radius: 10px;
+      border: 1px solid #d1d5db;
+      font-size: 14px;
+      outline: none;
+      transition: border 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    input[type="url"]:focus {
+      border-color: #2563eb;
+      box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.18);
+    }
+
+    button.primary {
+      width: 100%;
+      padding: 11px 12px;
+      margin-top: 6px;
+      border-radius: 10px;
+      border: none;
+      background: #2563eb;
+      color: #ffffff;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      transition: background 0.15s ease, transform 0.08s ease;
+    }
+
+    button.primary:hover {
+      background: #1d4ed8;
+    }
+
+    button.primary:active {
+      transform: scale(0.98);
+    }
+
+    .result-box {
+      margin-top: 16px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      background: #ecfdf3;
+      border: 1px solid #bbf7d0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .result-label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: #16a34a;
+      margin-bottom: 2px;
+    }
+
+    .result-link {
+      font-size: 13px;
+      color: #166534;
+      word-break: break-all;
+      text-decoration: none;
+    }
+
+    .copy-btn {
+      padding: 7px 12px;
+      font-size: 12px;
+      border-radius: 999px;
+      border: 1px solid #16a34a;
+      background: #ffffff;
+      color: #16a34a;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background 0.15s ease, color 0.15s ease;
+    }
+
+    .copy-btn:hover {
+      background: #16a34a;
+      color: #ffffff;
+    }
+
+    .error-msg {
+      margin-top: 6px;
+      font-size: 12px;
+      color: #b91c1c;
+    }
+
+    .links-section-title {
+      margin-top: 22px;
+      font-size: 14px;
+      font-weight: 600;
+      color: #111827;
+    }
+
+    table {
+      width: 100%;
+      margin-top: 8px;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+
+    th, td {
+      padding: 7px 6px;
+      text-align: left;
+      border-bottom: 1px solid #e5e7eb;
+      vertical-align: top;
+    }
+
+    th {
+      font-weight: 600;
+      color: #4b5563;
+      background: #f9fafb;
+    }
+
+    td {
+      color: #374151;
+    }
+
+    .short-link {
+      color: #2563eb;
+      text-decoration: none;
+      word-break: break-all;
+    }
+
+    .short-link:hover {
+      text-decoration: underline;
+    }
+
+    .tiny-badge {
+      display: inline-block;
+      padding: 1px 6px;
+      border-radius: 999px;
+      background: #eff6ff;
+      color: #1d4ed8;
+      font-size: 10px;
+      margin-left: 4px;
+    }
+
+    .small-btn {
+      padding: 4px 8px;
+      font-size: 11px;
+      border-radius: 999px;
+      border: 1px solid #9ca3af;
+      background: #ffffff;
+      cursor: pointer;
+      transition: background 0.15s ease;
+    }
+
+    .small-btn:hover {
+      background: #f3f4f6;
+    }
+
+    .click-count {
+      font-weight: 600;
+      color: #111827;
+    }
+
+    .footer {
+      margin-top: 18px;
+      text-align: center;
+      font-size: 11px;
+      color: #9ca3af;
+    }
+
+    @media (max-width: 640px) {
+      .card {
+        padding: 20px 18px 18px;
+      }
+
+      .title {
+        font-size: 22px;
+      }
+
+      th:nth-child(2),
+      td:nth-child(2) {
+        display: none; /* hide long URL col on tiny screens */
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1 class="title">TinyLink</h1>
+    <p class="subtitle">Lightweight URL shortener (frontend only using localStorage).</p>
+
+    <div class="input-group">
+      <label for="longUrl">Enter Long URL</label>
+      <input
+        type="url"
+        id="longUrl"
+        placeholder="https://example.com/some/very/long/link"
+        required
+      />
+      <button class="primary" id="shortenBtn">Shorten URL</button>
+      <div class="error-msg" id="errorMsg"></div>
+    </div>
+
+    <!-- Result -->
+    <div class="result-box" id="resultBox" style="display:none;">
+      <div style="flex:1;">
+        <div class="result-label">Your TinyLink</div>
+        <a href="#" id="resultLink" class="result-link" target="_blank"></a>
+      </div>
+      <button class="copy-btn" id="copyBtn">Copy</button>
+    </div>
+
+    <!-- List of generated links -->
+    <div>
+      <div class="links-section-title">Your Generated Links</div>
+      <table id="linksTable">
+        <thead>
+          <tr>
+            <th>Short Link</th>
+            <th>Original URL</th>
+            <th>Clicks</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="linksTableBody">
+          <!-- rows added via JS -->
+        </tbody>
+      </table>
+    </div>
+
+    <div class="footer">
+      Built as TinyLink frontend assignment • Data stored locally in your browser.
+    </div>
+  </div>
+
+  <script>
+    // ----- TinyLink Frontend Logic (no backend) -----
+
+    const STORAGE_KEY = "tinylink_links_v1";
+
+    function loadLinks() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return [];
+        return JSON.parse(raw);
+      } catch (e) {
+        console.error("Error reading from localStorage:", e);
+        return [];
+      }
+    }
+
+    function saveLinks(links) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(links));
+    }
+
+    function generateShortId() {
+      return "tny-" + Math.random().toString(36).substring(2, 8);
+    }
+
+    function renderTable() {
+      const tbody = document.getElementById("linksTableBody");
+      tbody.innerHTML = "";
+      const links = loadLinks();
+
+      if (!links.length) {
+        const row = document.createElement("tr");
+        const cell = document.createElement("td");
+        cell.colSpan = 4;
+        cell.textContent = "No links created yet. Shorten a URL to get started.";
+        cell.style.fontSize = "12px";
+        cell.style.color = "#6b7280";
+        row.appendChild(cell);
+        tbody.appendChild(row);
+        return;
+      }
+
+      links.forEach((item, index) => {
+        const row = document.createElement("tr");
+
+        const shortCell = document.createElement("td");
+        const shortLink = document.createElement("a");
+        shortLink.href = item.longUrl;
+        shortLink.target = "_blank";
+        shortLink.textContent = item.shortUrl;
+        shortLink.className = "short-link";
+        shortLink.addEventListener("click", () => handleOpenLink(index));
+        shortCell.appendChild(shortLink);
+        const badge = document.createElement("span");
+        badge.className = "tiny-badge";
+        badge.textContent = "tiny";
+        shortCell.appendChild(badge);
+
+        const longCell = document.createElement("td");
+        longCell.textContent = item.longUrl;
+
+        const clicksCell = document.createElement("td");
+        const spanCount = document.createElement("span");
+        spanCount.className = "click-count";
+        spanCount.textContent = item.clicks || 0;
+        clicksCell.appendChild(spanCount);
+
+        const actionsCell = document.createElement("td");
+        const openBtn = document.createElement("button");
+        openBtn.textContent = "Open";
+        openBtn.className = "small-btn";
+        openBtn.style.marginRight = "4px";
+        openBtn.addEventListener("click", () => handleOpenLink(index));
+
+        const deleteBtn = document.createElement("button");
+        deleteBtn.textContent = "Delete";
+        deleteBtn.className = "small-btn";
+        deleteBtn.addEventListener("click", () => handleDeleteLink(index));
+
+        actionsCell.appendChild(openBtn);
+        actionsCell.appendChild(deleteBtn);
+
+        row.appendChild(shortCell);
+        row.appendChild(longCell);
+        row.appendChild(clicksCell);
+        row.appendChild(actionsCell);
+
+        tbody.appendChild(row);
+      });
+    }
+
+    function handleOpenLink(index) {
+      const links = loadLinks();
+      const item = links[index];
+      if (!item) return;
+
+      item.clicks = (item.clicks || 0) + 1;
+      saveLinks(links);
+      window.open(item.longUrl, "_blank");
+      renderTable(); // update click count
+    }
+
+    function handleDeleteLink(index) {
+      const links = loadLinks();
+      links.splice(index, 1);
+      saveLinks(links);
+      renderTable();
+    }
+
+    function showResult(shortUrl) {
+      const box = document.getElementById("resultBox");
+      const link = document.getElementById("resultLink");
+      link.textContent = shortUrl;
+      link.href = shortUrl;
+      box.style.display = "flex";
+    }
+
+    document.getElementById("shortenBtn").addEventListener("click", () => {
+      const input = document.getElementById("longUrl");
+      const error = document.getElementById("errorMsg");
+      const url = input.value.trim();
+      error.textContent = "";
+
+      if (!url) {
+        error.textContent = "Please enter a URL.";
+        return;
+      }
+
+      try {
+        new URL(url);
+      } catch {
+        error.textContent = "Please enter a valid URL (e.g. https://example.com).";
+        return;
+      }
+
+      const shortId = generateShortId();
+      const base = "https://tinylink.local/"; // fake base just for display
+      const shortUrl = base + shortId;
+
+      const links = loadLinks();
+      links.unshift({
+        longUrl: url,
+        shortId,
+        shortUrl,
+        clicks: 0,
+        createdAt: new Date().toISOString(),
+      });
+      saveLinks(links);
+
+      showResult(shortUrl);
+      renderTable();
+      input.value = "";
+    });
+
+    document.getElementById("copyBtn").addEventListener("click", async () => {
+      const short = document.getElementById("resultLink").textContent;
+      if (!short) return;
+      try {
+        await navigator.clipboard.writeText(short);
+        alert("TinyLink copied to clipboard!");
+      } catch {
+        alert("Could not copy. Please copy manually.");
+      }
+    });
+
+    // Initial render
+    renderTable();
+  </script>
+</body>
+</html>
